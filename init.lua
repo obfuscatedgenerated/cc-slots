@@ -10,11 +10,6 @@ local play_sound = require "play_sound"
 
 local reel_pos = reels.random_reels()
 
-local spinning = false
-local spin_start_time = 0
-
-local stop_variances = { 0, 0, 0 }
-
 local sounds = {}
 
 function obsi.load()
@@ -66,6 +61,12 @@ local function update_reel(reel_idx, diff, left_margin, top_margin)
     obsi.graphics.draw(symbol.image, left_margin + ((reel_idx - 1) * symbol.image.width), top_margin)
 end
 
+local spinning = false
+local can_spin = true
+local spin_start_time = 0
+
+local stop_variances = { 0, 0, 0 }
+
 local played_sounds = {}
 local payout_next_sec = false
 
@@ -73,7 +74,7 @@ function obsi.update()
     -- TODO: take player money
 
     -- start the spin if space is pressed
-    if not spinning and obsi.keyboard.isScancodeDown(keys.space) then
+    if can_spin and not spinning and obsi.keyboard.isScancodeDown(keys.space) then
         -- randomise stop variances for each reel
         for i = 1, 3 do
             stop_variances[i] = math.random(-0.05, 0.3)
@@ -84,6 +85,7 @@ function obsi.update()
         redstone.setOutput("top", false)
 
         spinning = true
+        can_spin = false
         spin_start_time = obsi.timer.getTime()
     end
 
@@ -114,6 +116,8 @@ function obsi.update()
 
             -- TODO: payout the player
         end
+
+        can_spin = true
     end
 
     -- compute margins to center the reels (each reel image will have the same dimensions so we can use the first one)
