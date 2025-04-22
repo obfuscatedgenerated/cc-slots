@@ -3,7 +3,7 @@ symbols = symbols.symbols
 
 -- define reel strip to use for all 3 reels
 local reel = {
-    symbols.cherry.name, symbols.cherry.name, symbols.cherry.name, symbols.cherry.name, symbols.cherry.name,
+    symbols.cherry.name, symbols.cherry.name, symbols.cherry.name, symbols.cherry.name, symbols.cherry.name, symbols.cherry.name,
     symbols.lemon.name, symbols.lemon.name, symbols.lemon.name, symbols.lemon.name,
     symbols.orange.name, symbols.orange.name, symbols.orange.name, symbols.orange.name,
     symbols.plum.name, symbols.plum.name, symbols.plum.name, symbols.plum.name,
