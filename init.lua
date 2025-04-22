@@ -12,6 +12,12 @@ local reel_pos = reels.random_reels()
 
 local sounds = {}
 
+local spinning = false
+local can_spin = true
+local spin_start_time = 0
+
+local stop_variances = { 0, 0, 0 }
+
 function obsi.load()
     load_symbol_images()
 
@@ -58,16 +64,15 @@ local function update_reel(reel_idx, diff, left_margin, top_margin)
     local symbol_name = reels.reel[reel_pos[reel_idx]]
     local symbol = symbols[symbol_name]
 
-    obsi.graphics.draw(symbol.image, left_margin + ((reel_idx - 1) * symbol.image.width), top_margin)
+    local gap = 2
+    if reel_idx == 1 then
+        gap = 0
+    end
+
+    obsi.graphics.draw(symbol.image, left_margin + ((reel_idx - 1) * symbol.image.width) + gap, top_margin)
 end
 
-local spinning = false
-local can_spin = true
-local spin_start_time = 0
-
-local stop_variances = { 0, 0, 0 }
-
-local played_sounds = {}
+local played_sounds = {true, true, true}
 local payout_next_sec = false
 
 function obsi.update()
@@ -121,8 +126,8 @@ function obsi.update()
     end
 
     -- compute margins to center the reels (each reel image will have the same dimensions so we can use the first one)
-    local left_margin = math.abs(math.floor(obsi.graphics.getWidth() - (3 * symbols.cherry.image.width) / 2))
-    local top_margin = math.abs(math.floor(obsi.graphics.getHeight() - (3 * symbols.cherry.image.height) / 2))
+    local left_margin = math.floor((obsi.graphics.getPixelWidth() - (3 * symbols.cherry.image.width)) / 2)
+    local top_margin = math.floor((obsi.graphics.getPixelHeight() - (symbols.cherry.image.height)) / 2)
 
     -- update and draw the reels
     for i = 1, 3 do
