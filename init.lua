@@ -45,8 +45,9 @@ local function calculate_payout()
     return payout
 end
 
-local function update_reel(reel_idx, diff, left_margin)
+local function update_reel(reel_idx, diff, left_margin, top_margin)
     if left_margin == nil then left_margin = 1 end
+    if top_margin == nil then top_margin = 1 end
 
     if spinning then
         -- each reel stops staggered (1 second per reel and their random variance)
@@ -62,7 +63,7 @@ local function update_reel(reel_idx, diff, left_margin)
     local symbol_name = reels.reel[reel_pos[reel_idx]]
     local symbol = symbols[symbol_name]
 
-    obsi.graphics.draw(symbol.image, left_margin + ((reel_idx - 1) * symbol.image.width), 1)
+    obsi.graphics.draw(symbol.image, left_margin + ((reel_idx - 1) * symbol.image.width), top_margin)
 end
 
 local played_sounds = {}
@@ -115,9 +116,10 @@ function obsi.update()
         end
     end
 
-    -- compute left margin to center the reels (each reel image will have the same dimensions so we can use the first one)
+    -- compute margins to center the reels (each reel image will have the same dimensions so we can use the first one)
     local left_margin = math.floor(obsi.graphics.getWidth() - (1.5 * symbols.cherry.image.width))
-    
+    local top_margin = math.floor(obsi.graphics.getHeight() - (1.5 * symbols.cherry.image.height))
+
     -- update and draw the reels
     for i = 1, 3 do
         -- if the time for a sound to be played is passed, play the sound and marked it as played
@@ -127,7 +129,7 @@ function obsi.update()
             played_sounds[i] = true
         end
 
-        update_reel(i, diff, left_margin)
+        update_reel(i, diff, left_margin, top_margin)
     end
 
     -- TODO: nudge and hold
