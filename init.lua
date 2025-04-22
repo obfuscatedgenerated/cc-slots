@@ -45,7 +45,9 @@ local function calculate_payout()
     return payout
 end
 
-local function update_reel(reel_idx, diff)
+local function update_reel(reel_idx, diff, left_margin)
+    if left_margin == nil then left_margin = 1 end
+
     if spinning then
         -- each reel stops staggered (1 second per reel and their random variance)
         if diff <= (reel_idx + stop_variances[reel_idx]) then
@@ -60,13 +62,15 @@ local function update_reel(reel_idx, diff)
     local symbol_name = reels.reel[reel_pos[reel_idx]]
     local symbol = symbols[symbol_name]
 
-    obsi.graphics.draw(symbol.image, ((reel_idx - 1) * symbol.image.width) + 1, 1)
+    obsi.graphics.draw(symbol.image, left_margin + ((reel_idx - 1) * symbol.image.width), 1)
 end
 
 local played_sounds = {}
 local payout_next_sec = false
 
 function obsi.update()
+    -- TODO: take player money
+
     -- start the spin if space is pressed
     if not spinning and obsi.keyboard.isScancodeDown(keys.space) then
         -- randomise stop variances for each reel
@@ -76,6 +80,8 @@ function obsi.update()
 
         -- start spin
         played_sounds = {}
+        redstone.setOutput("top", false)
+
         spinning = true
         spin_start_time = obsi.timer.getTime()
     end
@@ -96,14 +102,22 @@ function obsi.update()
 
         local payout = calculate_payout()
         if payout > 0 then
+            -- play the right sound
             if payout == symbols.jackpot.payout.triple then
+                -- light up our light and play the sound
+                redstone.setOutput("top", true)
                 play_sound(sounds.jackpot)
             else
                 play_sound(sounds.win)
             end
+
+            -- TODO: payout the player
         end
     end
 
+    -- compute left margin to center the reels (each reel image will have the same dimensions so we can use the first one)
+    local left_margin = math.floor(obsi.graphics.getWidth() - (1.5 * symbols.cherry.image.width))
+    
     -- update and draw the reels
     for i = 1, 3 do
         -- if the time for a sound to be played is passed, play the sound and marked it as played
@@ -113,8 +127,10 @@ function obsi.update()
             played_sounds[i] = true
         end
 
-        update_reel(i, diff)
+        update_reel(i, diff, left_margin)
     end
+
+    -- TODO: nudge and hold
 end
 
 obsi.init()
