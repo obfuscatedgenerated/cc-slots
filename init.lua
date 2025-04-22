@@ -117,8 +117,8 @@ function obsi.update()
     end
 
     -- compute margins to center the reels (each reel image will have the same dimensions so we can use the first one)
-    local left_margin = math.floor(obsi.graphics.getWidth() - (1.5 * symbols.cherry.image.width))
-    local top_margin = math.floor(obsi.graphics.getHeight() - (1.5 * symbols.cherry.image.height))
+    local left_margin = math.abs(math.floor(obsi.graphics.getWidth() - (3 * symbols.cherry.image.width) / 2))
+    local top_margin = math.abs(math.floor(obsi.graphics.getHeight() - (3 * symbols.cherry.image.height) / 2))
 
     -- update and draw the reels
     for i = 1, 3 do
