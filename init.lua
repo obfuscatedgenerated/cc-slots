@@ -1,5 +1,10 @@
 local obsi = require "/lib/obsi2"
 
+local casino
+if fs.exists("/clientlib.lua") then
+    casino = require "/clientlib"
+end
+
 local symbols = require "symbols"
 local load_symbol_images = symbols.load_symbol_images
 symbols = symbols.symbols
@@ -28,7 +33,6 @@ function obsi.load()
     sounds.win = "sounds/win.wav"
     sounds.jackpot = "sounds/jackpot.wav"
 end
-
 
 local function calculate_payout()
     local payout = 0
@@ -72,14 +76,52 @@ local function update_reel(reel_idx, diff, left_margin, top_margin)
     obsi.graphics.draw(symbol.image, left_margin + ((reel_idx - 1) * symbol.image.width) + gap, top_margin)
 end
 
-local played_sounds = {true, true, true}
+local played_sounds = { true, true, true }
 local payout_next_sec = false
 
 function obsi.update()
-    -- TODO: take player money
+    local iden_id
 
     -- start the spin if space is pressed
     if can_spin and not spinning and obsi.keyboard.isScancodeDown(keys.space) then
+        -- take player money if casino module loaded
+        if casino then
+            -- Read player's identity
+            local identity = casino.read_card_identity()
+            if not identity then
+                print("Identity not found")
+                return
+            end
+
+            -- Get or create the player's identity from the server
+            local id, err = casino.get_or_create_identity(identity)
+            if not id then
+                print("Failed to get or create identity:", err)
+                return
+            end
+
+            local iden = casino.fetch_identity(id)
+            if not iden then
+                print("Failed to fetch identity")
+                return
+            end
+
+            iden_id = iden.id
+
+            -- Check if the balance is enough to play
+            if iden.chips < 2 then
+                print("Not enough balance to play. You need at least 2 chips.")
+                return
+            end
+
+            -- Deduct 2 chips from the player's balance
+            local increase_balance_response, increase_balance_err = casino.increase_balance(iden.id, -2)
+            if not increase_balance_response then
+                print("Failed to deduct 2 chips:", increase_balance_err)
+                return
+            end
+        end
+
         -- randomise stop variances for each reel
         for i = 1, 3 do
             stop_variances[i] = math.random(-0.05, 0.3)
@@ -119,7 +161,9 @@ function obsi.update()
                 play_sound(sounds.win)
             end
 
-            -- TODO: payout the player
+            if iden_id and casino then
+                casino.increase_balance(iden_id, payout)
+            end
         end
 
         can_spin = true
