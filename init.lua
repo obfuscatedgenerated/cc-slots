@@ -87,16 +87,9 @@ function obsi.update()
         -- take player money if casino module loaded
         if casino then
             -- Read player's identity
-            local identity = casino.read_card_identity()
-            if not identity then
-                print("Identity not found")
-                return
-            end
-
-            -- Get or create the player's identity from the server
-            local id, err = casino.get_or_create_identity(identity)
+            local id = casino.read_card_identity()
             if not id then
-                print("Failed to get or create identity:", err)
+                print("No identity")
                 return
             end
 
