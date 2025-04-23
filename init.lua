@@ -99,9 +99,9 @@ function obsi.update()
     obsi.graphics.write(bottom_text, bottom_text_x, obsi.graphics.getHeight() - 1)
 
     -- draw a toast if available
-    if toast and toast_start_time + toast_duration < obsi.timer.getTime() then
+    if toast and obsi.timer.getTime() - toast_start_time < toast_duration then
         local text_x = math.floor((obsi.graphics.getWidth() - #toast) / 2)
-        obsi.graphics.write(toast, text_x, 1)
+        obsi.graphics.write(toast, text_x, 2)
     end
 
     local iden_id
@@ -113,7 +113,7 @@ function obsi.update()
             -- Read player's identity
             local id = casino.read_card_identity()
             if not id then
-                show_toast("Please insert a card with loaded chips to play!")
+                show_toast("Please insert a card with chips to play!")
                 return
             end
 
