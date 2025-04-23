@@ -79,7 +79,31 @@ end
 local played_sounds = { true, true, true }
 local payout_next_sec = false
 
+local toast = ""
+local toast_start_time = 0
+local toast_duration = 3
+
+local function show_toast(text, duration)
+    if duration then
+        toast_duration = duration
+    end
+
+    toast = text
+    toast_start_time = obsi.timer.getTime()
+end
+
 function obsi.update()
+    -- draw bottom text
+    local bottom_text = "Cost: 2 chips. Press SPACE to spin!"
+    local bottom_text_x = math.floor((obsi.graphics.getWidth() - #bottom_text) / 2)
+    obsi.graphics.write(bottom_text, bottom_text_x, obsi.graphics.getHeight() - 1)
+
+    -- draw a toast if available
+    if toast and toast_start_time + toast_duration < obsi.timer.getTime() then
+        local text_x = math.floor((obsi.graphics.getWidth() - #toast) / 2)
+        obsi.graphics.write(toast, text_x, 1)
+    end
+
     local iden_id
 
     -- start the spin if space is pressed
@@ -89,13 +113,13 @@ function obsi.update()
             -- Read player's identity
             local id = casino.read_card_identity()
             if not id then
-                print("No identity")
+                show_toast("Please insert a card with loaded chips to play!")
                 return
             end
 
             local iden = casino.fetch_identity(id)
             if not iden then
-                print("Failed to fetch identity")
+                show_toast("Failed to fetch identity. Please try again or ask for help.")
                 return
             end
 
@@ -103,14 +127,14 @@ function obsi.update()
 
             -- Check if the balance is enough to play
             if iden.chips < 2 then
-                print("Not enough balance to play. You need at least 2 chips.")
+                show_toast("Not enough balance to play. You need at least 2 chips.")
                 return
             end
 
             -- Deduct 2 chips from the player's balance
             local increase_balance_response, increase_balance_err = casino.increase_balance(iden.id, -2)
             if not increase_balance_response then
-                print("Failed to deduct 2 chips:", increase_balance_err)
+                show_toast("Failed to deduct 2 chips:" .. increase_balance_err)
                 return
             end
         end
@@ -153,6 +177,8 @@ function obsi.update()
             else
                 play_sound(sounds.win)
             end
+
+            show_toast("You won " .. payout .. " chips!", 5)
 
             if iden_id and casino then
                 casino.increase_balance(iden_id, payout)
