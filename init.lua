@@ -132,8 +132,8 @@ function obsi.update()
             end
 
             -- Deduct 2 chips from the player's balance
-            local increase_balance_response, increase_balance_err = casino.increase_balance(iden.id, -2)
-            if not increase_balance_response then
+            local decrease_balance_response, decrease_balance_err = casino.decrease_balance(iden.id, 2)
+            if not decrease_balance_response then
                 show_toast("Chip error. Please try again or ask for help.")
                 return
             end
