@@ -79,8 +79,8 @@ end
 local played_sounds = { true, true, true }
 local payout_next_sec = false
 
-local toast = ""
-local toast_start_time = 0
+local toast = nil
+local toast_start_time = nil
 local toast_duration = 3
 
 local function show_toast(text, duration)
@@ -88,13 +88,13 @@ local function show_toast(text, duration)
         toast_duration = duration
     end
 
-    toast = text
     toast_start_time = obsi.timer.getTime()
+    toast = text
 end
 
 function obsi.update()
     -- draw bottom text
-    local bottom_text = "Cost: 2 chips. Press SPACE to spin!"
+    local bottom_text = "2 chips a play. Press SPACE to spin!"
     local bottom_text_x = math.floor((obsi.graphics.getWidth() - #bottom_text) / 2)
     obsi.graphics.write(bottom_text, bottom_text_x, obsi.graphics.getHeight() - 1)
 
@@ -178,7 +178,11 @@ function obsi.update()
                 play_sound(sounds.win)
             end
 
-            show_toast("You won " .. payout .. " chips!", 5)
+            local chips_plural = "chip"
+            if payout > 1 then
+                chips_plural = "chips"
+            end
+            show_toast("You won " .. payout .. " " .. chips_plural .. "!", 5)
 
             if iden_id and casino then
                 casino.increase_balance(iden_id, payout)
