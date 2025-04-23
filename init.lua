@@ -119,7 +119,7 @@ function obsi.update()
 
             local iden = casino.fetch_identity(id)
             if not iden then
-                show_toast("Failed to fetch identity. Please try again or ask for help.")
+                show_toast("ID error. Please try again or ask for help.")
                 return
             end
 
@@ -127,14 +127,14 @@ function obsi.update()
 
             -- Check if the balance is enough to play
             if iden.chips < 2 then
-                show_toast("Not enough balance to play. You need at least 2 chips.")
+                show_toast("Please top up your chips!")
                 return
             end
 
             -- Deduct 2 chips from the player's balance
             local increase_balance_response, increase_balance_err = casino.increase_balance(iden.id, -2)
             if not increase_balance_response then
-                show_toast("Failed to deduct 2 chips:" .. increase_balance_err)
+                show_toast("Chip error. Please try again or ask for help.")
                 return
             end
         end
