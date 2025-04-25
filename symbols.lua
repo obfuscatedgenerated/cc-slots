@@ -1,19 +1,18 @@
 local obsi = require "/lib/obsi2"
 
 local symbols = {
-    cherry = { name = "cherry", image = nil, payout = { double = 1, triple = 2 } },
-    lemon = { name = "lemon", image = nil, payout = { double = 2, triple = 5 } },
-    orange = { name = "orange", image = nil, payout = { double = 2, triple = 4 } },
-    plum = { name = "plum", image = nil, payout = { double = 2, triple = 6 } },
-    grape = { name = "grape", image = nil, payout = { double = 2, triple = 3 } },
-    seven = { name = "seven", image = nil, payout = { triple = 50 } },
-    bell = { name = "bell", image = nil, payout = { triple = 8 } },
-    bar_single = { name = "bar_single", image = nil, payout = { triple = 10 } },
-    bar_double = { name = "bar_double", image = nil, payout = { triple = 20 } },
-    bar_triple = { name = "bar_triple", image = nil, payout = { triple = 30 } },
-    jackpot = { name = "jackpot", image = nil, payout = { triple = 100 } },
+    cherry = { name = "cherry", image = nil, payout = { double = 2, triple = 4 } },
+    lemon = { name = "lemon", image = nil, payout = { double = 3, triple = 6 } },
+    orange = { name = "orange", image = nil, payout = { double = 3, triple = 5 } },
+    plum = { name = "plum", image = nil, payout = { double = 3, triple = 8 } },
+    grape = { name = "grape", image = nil, payout = { double = 3, triple = 4 } },
+    seven = { name = "seven", image = nil, payout = { triple = 60 } },
+    bell = { name = "bell", image = nil, payout = { triple = 12 } },
+    bar_single = { name = "bar_single", image = nil, payout = { triple = 15 } },
+    bar_double = { name = "bar_double", image = nil, payout = { triple = 25 } },
+    bar_triple = { name = "bar_triple", image = nil, payout = { triple = 35 } },
+    jackpot = { name = "jackpot", image = nil, payout = { triple = 120 } },
 }
-
 local TARGET_SIZE_X, TARGET_SIZE_Y = 24, 24
 
 local function load_symbol_images()
