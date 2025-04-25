@@ -186,7 +186,7 @@ function obsi.update()
             if payout > 1 then
                 chips_plural = "chips"
             end
-            show_toast("You won " .. payout .. " " .. chips_plural .. "!", 5)
+            show_toast("You won " .. payout .. " " .. chips_plural .. "!", 3)
 
             if iden_id and casino then
                 casino.increase_balance(iden_id, payout)
