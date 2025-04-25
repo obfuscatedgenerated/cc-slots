@@ -43,8 +43,10 @@ local function calculate_payout()
 
     if symbol_1 == symbol_2 and symbol_2 == symbol_3 then
         payout = symbols[symbol_1].payout.triple or 0
-    elseif symbol_1 == symbol_2 or symbol_2 == symbol_3 or symbol_1 == symbol_3 then
+    elseif symbol_1 == symbol_2 or symbol_1 == symbol_3 then
         payout = symbols[symbol_1].payout.double or 0
+    elseif symbol_2 == symbol_3 then
+        payout = symbols[symbol_2].payout.double or 0
     end
 
     return payout
