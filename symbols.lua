@@ -2,10 +2,10 @@ local obsi = require "/lib/obsi2"
 
 local symbols = {
     cherry = { name = "cherry", image = nil, payout = { double = 1, triple = 2 } },
-    lemon = { name = "lemon", image = nil, payout = { triple = 5 } },
-    orange = { name = "orange", image = nil, payout = { triple = 4 } },
-    plum = { name = "plum", image = nil, payout = { triple = 6 } },
-    grape = { name = "grape", image = nil, payout = { triple = 3 } },
+    lemon = { name = "lemon", image = nil, payout = { double = 2, triple = 5 } },
+    orange = { name = "orange", image = nil, payout = { double = 2, triple = 4 } },
+    plum = { name = "plum", image = nil, payout = { double = 2, triple = 6 } },
+    grape = { name = "grape", image = nil, payout = { double = 2, triple = 3 } },
     seven = { name = "seven", image = nil, payout = { triple = 50 } },
     bell = { name = "bell", image = nil, payout = { triple = 8 } },
     bar_single = { name = "bar_single", image = nil, payout = { triple = 10 } },
