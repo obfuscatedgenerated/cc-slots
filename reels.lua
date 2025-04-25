@@ -1,6 +1,8 @@
 local symbols = require "symbols"
 symbols = symbols.symbols
 
+local SEED = 314
+
 -- define reel strip to use for all 3 reels
 local reel = {
     symbols.cherry.name, symbols.cherry.name, symbols.cherry.name, symbols.cherry.name, symbols.cherry.name, symbols.cherry.name,
@@ -15,6 +17,14 @@ local reel = {
     symbols.bell.name, symbols.bell.name,
     symbols.jackpot.name
 }
+
+-- since we step through the reel each tick for the randomisation, we want to split apart the fruits being together (but still write the table in a readable way
+-- so shuffle it at require time with a fixed seed for consistency between plays
+math.randomseed(SEED)
+for i = #reel, 2, -1 do
+    local j = math.random(i)
+    reel[i], reel[j] = reel[j], reel[i]
+end
 
 local function random_reels()
     return { math.random(1, #reel), math.random(1, #reel), math.random(1, #reel) }
