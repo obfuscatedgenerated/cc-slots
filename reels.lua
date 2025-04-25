@@ -28,6 +28,10 @@ for i = #reel, 2, -1 do
     reel[i], reel[j] = reel[j], reel[i]
 end
 
+-- change the seed back to time so that the reel pos randomisation and variances are "truly" random again
+-- (or else the spins are are predictable sequence!)
+math.randomseed(os.epoch("utc"))
+
 local function random_reels()
     return { math.random(1, #reel), math.random(1, #reel), math.random(1, #reel) }
 end
