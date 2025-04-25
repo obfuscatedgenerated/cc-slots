@@ -10,11 +10,11 @@ local reel = {
     symbols.orange.name, symbols.orange.name, symbols.orange.name, symbols.orange.name, symbols.orange.name,
     symbols.plum.name, symbols.plum.name, symbols.plum.name, symbols.plum.name, symbols.plum.name,
     symbols.grape.name, symbols.grape.name, symbols.grape.name, symbols.grape.name,
-    symbols.bar_single.name, symbols.bar_single.name, symbols.bar_single.name, symbols.bar_single.name,
-    symbols.bar_double.name, symbols.bar_double.name,
-    symbols.bar_triple.name,
+    symbols.bar_single.name, symbols.bar_single.name, symbols.bar_single.name,
+    symbols.bar_double.name, symbols.bar_double.name, symbols.bar_double.name,
+    symbols.bar_triple.name, symbols.bar_triple.name,
     symbols.seven.name, symbols.seven.name,
-    symbols.bell.name, symbols.bell.name,
+    symbols.bell.name, symbols.bell.name, symbols.bell.name,
     symbols.jackpot.name
 }
 
