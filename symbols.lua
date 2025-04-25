@@ -1,7 +1,7 @@
 local obsi = require "/lib/obsi2"
 
 local symbols = {
-    cherry = { name = "cherry", image = nil, payout = { double = 2, triple = 4 } },
+    cherry = { name = "cherry", image = nil, payout = { double = 1, triple = 2 } },
     lemon = { name = "lemon", image = nil, payout = { double = 3, triple = 6 } },
     orange = { name = "orange", image = nil, payout = { double = 3, triple = 5 } },
     plum = { name = "plum", image = nil, payout = { double = 3, triple = 8 } },
