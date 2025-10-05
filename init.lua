@@ -148,11 +148,8 @@ local function offer_holds()
 
             local roll = math.random(1, 100)
             if roll <= 50 then
-                holds[1] = true
-                holds[2] = true
                 holds_available = 2
             elseif roll <= 80 then
-                holds[1] = true
                 holds_available = 1
             end
         else
@@ -160,7 +157,6 @@ local function offer_holds()
 
             local roll = math.random(1, 100)
             if roll <= 20 then
-                holds[1] = true
                 holds_available = 1
             end
         end
@@ -175,12 +171,33 @@ local function offer_holds()
     end
 end
 
+local function toggle_hold(reel_idx)
+    if not can_spin or spinning then
+        return
+    end
+
+
+    if holds[reel_idx] then
+        -- give back a hold if abandoning a hold
+        holds[reel_idx] = false
+        holds_available = holds_available + 1
+    else
+        if holds_available > 0 then
+            -- use a hold if applying a hold
+            holds[reel_idx] = true
+            holds_available = holds_available - 1
+        end
+    end
+end
+
 local played_sounds = { true, true, true }
 local payout_next_sec = false
 
 local toast = nil
 local toast_start_time = nil
 local toast_duration = 3
+
+local hold_waiting_keyup = false
 
 local function show_toast(text, duration)
     if duration then
@@ -207,16 +224,36 @@ function obsi.update()
 
     -- draw holds available if any
     if holds_available > 0 then
-        local holds_text = "Holds available: " .. holds_available .. " (not implemented yet)"
+        local holds_text = "Holds available: " .. holds_available
         local holds_text_x = math.floor((obsi.graphics.getWidth() - #holds_text) / 2)
         obsi.graphics.write(holds_text, holds_text_x, obsi.graphics.getHeight() - 4)
 
-        local holds_instruction_text = "Use the number keys 1, 2, 3 to toggle holding the corresponding reel."
+        local holds_instruction_text = "Press 1, 2, 3 to toggle hold on a reel."
         local holds_instruction_text_x = math.floor((obsi.graphics.getWidth() - #holds_instruction_text) / 2)
         obsi.graphics.write(holds_instruction_text, holds_instruction_text_x, obsi.graphics.getHeight() - 3)
     end
 
     local iden_id
+
+    -- toggle holds if number keys are pressed
+    if obsi.keyboard.isScancodeDown(keys.one) then
+        if not hold_waiting_keyup then
+            hold_waiting_keyup = true
+            toggle_hold(1)
+        end
+    elseif obsi.keyboard.isScancodeDown(keys.two) then
+        if not hold_waiting_keyup then
+            hold_waiting_keyup = true
+            toggle_hold(2)
+        end
+    elseif obsi.keyboard.isScancodeDown(keys.three) then
+        if not hold_waiting_keyup then
+            hold_waiting_keyup = true
+            toggle_hold(3)
+        end
+    else
+        hold_waiting_keyup = false
+    end
 
     -- start the spin if space is pressed
     if can_spin and not spinning and obsi.keyboard.isScancodeDown(keys.space) then
@@ -324,7 +361,6 @@ function obsi.update()
     end
 
     -- TODO: implement nudge (might want a way to preview what comes next)
-    -- TODO: implement logic to apply holds
 end
 
 obsi.init()
