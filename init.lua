@@ -52,11 +52,15 @@ local function calculate_payout()
     return payout
 end
 
+local holds = { false, false, false }
+local holds_available = 0
+
 local function update_reel(reel_idx, diff, left_margin, top_margin)
     if left_margin == nil then left_margin = 1 end
     if top_margin == nil then top_margin = 1 end
 
-    if spinning then
+    -- don't apply spin logic if reel is held
+    if spinning and not holds[reel_idx] then
         -- each reel stops staggered (1 second per reel and their random variance)
         if diff <= (reel_idx + stop_variances[reel_idx]) then
             -- increment position and wrap around
@@ -76,6 +80,99 @@ local function update_reel(reel_idx, diff, left_margin, top_margin)
     end
 
     obsi.graphics.draw(symbol.image, left_margin + ((reel_idx - 1) * symbol.image.width) + gap, top_margin)
+
+    -- draw hold status above image if held
+    if holds[reel_idx] then
+        local hold_text = "(HOLD)"
+        local hold_text_x = left_margin + math.floor((gap + (reel_idx - 1) * symbol.image.width - #hold_text) / 2) - 1
+        obsi.graphics.write(hold_text, hold_text_x, math.floor(top_margin / 2) - 3)
+    end
+end
+
+local function list_contains(list, value)
+    for _, v in ipairs(list) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
+local function offer_holds()
+    -- in actual fruit machines, holds are a bit deceptive as the game already knows what the next symbols will be
+    -- in this one, since the rtp is so low, these are actual strategic advantages and the game knows nothing about the next symbols
+    
+    -- for high value doubles:
+    -- 50% chance to offer 2 holds
+    -- 30% chance to offer 1 hold
+    -- 20% chance to offer no holds
+
+    -- for low value doubles:
+    -- 20% chance to offer 1 hold
+    -- 80% chance to offer no holds
+
+    -- for no doubles:
+    -- 5% chance to offer 1 hold
+
+    holds = { false, false, false }
+    holds_available = 0
+
+    local symbol_1 = reels.reel[reel_pos[1]]
+    local symbol_2 = reels.reel[reel_pos[2]]
+    local symbol_3 = reels.reel[reel_pos[3]]
+
+    local high_value = {
+        "bar_single",
+        "bar_double",
+        "bar_triple",
+        "jackpot",
+        "seven",
+        "bell",
+    }
+
+    if symbol_1 == symbol_2 and symbol_2 == symbol_3 then
+        -- triple - no holds
+        return
+    elseif symbol_1 == symbol_2 or symbol_1 == symbol_3 or symbol_2 == symbol_3 then
+        -- deterime which symbol is the double
+        local double_symbol = symbol_1
+        if symbol_1 ~= symbol_2 then
+            double_symbol = symbol_2
+        end
+        if symbol_1 ~= symbol_3 and symbol_2 ~= symbol_3 then
+            double_symbol = symbol_3
+        end
+
+        if list_contains(high_value, double_symbol) then
+            -- high value double
+
+            local roll = math.random(1, 100)
+            if roll <= 50 then
+                holds[1] = true
+                holds[2] = true
+                holds_available = 2
+            elseif roll <= 80 then
+                holds[1] = true
+                holds_available = 1
+            end
+        else
+            -- low value double
+
+            local roll = math.random(1, 100)
+            if roll <= 20 then
+                holds[1] = true
+                holds_available = 1
+            end
+        end
+    else
+        -- no doubles
+        local roll = math.random(1, 100)
+        if roll <= 5 then
+            holds_available = 1
+        else
+            holds_available = 0
+        end
+    end
 end
 
 local played_sounds = { true, true, true }
@@ -95,7 +192,7 @@ local function show_toast(text, duration)
 end
 
 function obsi.update()
-    -- draw bottom text=
+    -- draw bottom text
     local bottom_text = "Press SPACE to spin!"
     if casino then bottom_text = "2 chips a play. " .. bottom_text end
 
@@ -106,6 +203,17 @@ function obsi.update()
     if toast and obsi.timer.getTime() - toast_start_time < toast_duration then
         local text_x = math.floor((obsi.graphics.getWidth() - #toast) / 2)
         obsi.graphics.write(toast, text_x, 2)
+    end
+
+    -- draw holds available if any
+    if holds_available > 0 then
+        local holds_text = "Holds available: " .. holds_available .. " (not implemented yet)"
+        local holds_text_x = math.floor((obsi.graphics.getWidth() - #holds_text) / 2)
+        obsi.graphics.write(holds_text, holds_text_x, obsi.graphics.getHeight() - 4)
+
+        local holds_instruction_text = "Use the number keys 1, 2, 3 to toggle holding the corresponding reel."
+        local holds_instruction_text_x = math.floor((obsi.graphics.getWidth() - #holds_instruction_text) / 2)
+        obsi.graphics.write(holds_instruction_text, holds_instruction_text_x, obsi.graphics.getHeight() - 3)
     end
 
     local iden_id
@@ -149,6 +257,7 @@ function obsi.update()
         end
 
         -- start spin
+        holds_available = 0
         played_sounds = {}
         redstone.setOutput("top", false)
 
@@ -194,6 +303,8 @@ function obsi.update()
         end
 
         can_spin = true
+
+        offer_holds()
     end
 
     -- compute margins to center the reels (each reel image will have the same dimensions so we can use the first one)
@@ -212,7 +323,8 @@ function obsi.update()
         update_reel(i, diff, left_margin, top_margin)
     end
 
-    -- TODO: nudge and hold
+    -- TODO: implement nudge (might want a way to preview what comes next)
+    -- TODO: implement logic to apply holds
 end
 
 obsi.init()
