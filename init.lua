@@ -218,12 +218,14 @@ local function show_toast(text, duration)
 end
 
 function obsi.update()
-    -- draw bottom text
-    local bottom_text = "Press SPACE to spin!"
-    if casino then bottom_text = "2 chips a play. " .. bottom_text end
+    -- draw bottom text if can spin
+    if can_spin then
+        local bottom_text = "Press SPACE to spin!"
+        if casino then bottom_text = "2 chips a play. " .. bottom_text end
 
-    local bottom_text_x = math.floor((obsi.graphics.getWidth() - #bottom_text) / 2)
-    obsi.graphics.write(bottom_text, bottom_text_x, obsi.graphics.getHeight() - 1)
+        local bottom_text_x = math.floor((obsi.graphics.getWidth() - #bottom_text) / 2)
+        obsi.graphics.write(bottom_text, bottom_text_x, obsi.graphics.getHeight() - 1)
+    end
 
     -- draw a toast if available
     if toast and obsi.timer.getTime() - toast_start_time < toast_duration then
