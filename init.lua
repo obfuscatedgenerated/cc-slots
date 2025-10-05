@@ -98,6 +98,7 @@ local function list_contains(list, value)
     return false
 end
 
+local offered_hold_last_spin = false
 local function offer_holds()
     -- in actual fruit machines, holds are a bit deceptive as the game already knows what the next symbols will be
     -- in this one, since the rtp is so low, these are actual strategic advantages and the game knows nothing about the next symbols
@@ -114,8 +115,12 @@ local function offer_holds()
     -- for no doubles:
     -- 5% chance to offer 1 hold
 
-    holds = { false, false, false }
-    holds_available = 0
+    if offered_hold_last_spin then
+        -- don't offer holds two spins in a row
+        offered_hold_last_spin = false
+        holds_available = 0
+        return
+    end
 
     local symbol_1 = reels.reel[reel_pos[1]]
     local symbol_2 = reels.reel[reel_pos[2]]
@@ -168,6 +173,10 @@ local function offer_holds()
         else
             holds_available = 0
         end
+    end
+
+    if holds_available > 0 then
+        offered_hold_last_spin = true
     end
 end
 
@@ -339,9 +348,11 @@ function obsi.update()
             end
         end
 
-        can_spin = true
-
+        holds = { false, false, false }
+        holds_available = 0
         offer_holds()
+
+        can_spin = true
     end
 
     -- compute margins to center the reels (each reel image will have the same dimensions so we can use the first one)
