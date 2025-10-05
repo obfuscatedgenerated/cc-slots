@@ -10,7 +10,7 @@ And yes, it's painfully unfair, as all good casinos are.
 
 ## Setup
 
-Clone all files into the computer you want to run on.Ideally, use an advanced computer for colour support.
+Clone all files into the computer you want to run on. Ideally, use an advanced computer for colour support.
 
 You also need [obsi2](https://github.com/simadude/obsi2/releases/tag/v2.2.0) on the computer, at the path `/lib/obsi2.lua`.
 
